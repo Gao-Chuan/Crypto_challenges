@@ -1,0 +1,22 @@
+FROM fedora:34
+
+WORKDIR /crypto/
+
+RUN dnf update  -y\
+    && dnf install -y gmp-devel flex bison wget\
+    && dnf groupinstall -y "Development Tools" "Development Libraries" \
+    && wget https://crypto.stanford.edu/pbc/files/pbc-0.5.14.tar.gz \
+    && tar -xzf pbc-0.5.14.tar.gz \
+    && cd pbc-0.5.14 \
+    && ./configure \
+    && make \
+    && make install \
+    && echo /usr/local/lib > /etc/ld.so.conf.d/pbc.conf \
+    && ldconfig 
+
+COPY conflict /crypto/
+COPY flag.txt /crypto/
+
+EXPOSE 10086
+
+CMD ["/crypto/conflict"]
